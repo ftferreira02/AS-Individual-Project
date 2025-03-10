@@ -20,11 +20,16 @@ var withApiVersioning = builder.Services.AddApiVersioning();
 
 builder.AddDefaultOpenApi(withApiVersioning);
 
-var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
-
 var meter = new Meter("Ordering.API");
 builder.Services.AddSingleton(meter);
 builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Número total de orders."));
+
+// Register the new metrics for dependency injection
+var orderProcessingTimeHistogram = meter.CreateHistogram<double>("order_processing_time", unit: "ms", description: "Time taken to process orders");
+builder.Services.AddSingleton(orderProcessingTimeHistogram);
+
+var activeOrdersGauge = meter.CreateUpDownCounter<int>("active_orders", description: "Number of currently active orders");
+builder.Services.AddSingleton(activeOrdersGauge);
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>

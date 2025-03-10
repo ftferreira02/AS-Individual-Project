@@ -22,6 +22,8 @@ services:
       - "4318:4318"   # OTLP HTTP
       - "9464:9464"   # Exportar metricas para Prometheus
       - "14269:14268" # Recebimento de spans via OTLP (alterado para 14269)
+    depends_on:
+        - prometheus
 
   prometheus:
     image: prom/prometheus:latest
@@ -39,12 +41,11 @@ services:
         - GF_SECURITY_ADMIN_PASSWORD=admin  # Default admin password
         - GF_SECURITY_ADMIN_USER=admin      # Default admin username
       volumes:
-        - grafana-storage:/var/lib/grafana  # Persist Grafana data
+        - grafana-storage:/var/lib/grafana
+        - ./grafana/provisioning:/etc/grafana/provisioning  # Auto-provision dashboards
+        - ./grafana/dashboards:/var/lib/grafana/dashboards  # Store JSON dashboards
       depends_on:
         - prometheus
 
 volumes:
     grafana-storage:
-        driver: local
-    prometheus-data:
-        driver: local

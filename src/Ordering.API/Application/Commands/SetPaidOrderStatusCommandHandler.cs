@@ -1,13 +1,25 @@
-﻿namespace eShop.Ordering.API.Application.Commands;
+﻿using System.Diagnostics.Metrics;
+using Microsoft.Extensions.Logging;
+
+namespace eShop.Ordering.API.Application.Commands;
 
 // Regular CommandHandler
 public class SetPaidOrderStatusCommandHandler : IRequestHandler<SetPaidOrderStatusCommand, bool>
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly UpDownCounter<int> _activeOrdersGauge;
+    private readonly ILogger<ShipOrderCommandHandler> _logger;
 
-    public SetPaidOrderStatusCommandHandler(IOrderRepository orderRepository)
+    public SetPaidOrderStatusCommandHandler
+        (IOrderRepository orderRepository
+        , UpDownCounter<int> activeOrdersGauge,
+        ILogger<ShipOrderCommandHandler> logger)
     {
         _orderRepository = orderRepository;
+        _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+
     }
 
     /// <summary>
@@ -28,6 +40,10 @@ public class SetPaidOrderStatusCommandHandler : IRequestHandler<SetPaidOrderStat
         }
 
         orderToUpdate.SetPaidStatus();
+        // Decrement the active orders counter when an order is shipped
+        _activeOrdersGauge.Add(-1,
+            new KeyValuePair<string, object>("orderId", command.OrderNumber.ToString()));
+
         return await _orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
     }
 }
