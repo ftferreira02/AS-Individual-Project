@@ -1,8 +1,9 @@
-﻿using OpenTelemetry.Trace;
-using OpenTelemetry.Resources;
-using System.Diagnostics.Metrics;
+﻿using System.Diagnostics.Metrics;
 using OpenTelemetry.Metrics;
-
+using OpenTelemetry.Trace;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Instrumentation.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,16 +11,35 @@ var builder = WebApplication.CreateBuilder(args);
 string jaegerHost = builder.Configuration["JAEGER_HOST"] ?? "localhost";
 int jaegerPort = int.TryParse(builder.Configuration["JAEGER_PORT"], out var port) ? port : 6831;
 
-// Configuração do OpenTelemetry
+
+builder.AddServiceDefaults();
+builder.AddApplicationServices();
+builder.Services.AddProblemDetails();
+
+var withApiVersioning = builder.Services.AddApiVersioning();
+
+builder.AddDefaultOpenApi(withApiVersioning);
+
 var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
 
-// Criando e registrando o Meter no DI container
 var meter = new Meter("Ordering.API");
 builder.Services.AddSingleton(meter);
 builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Número total de orders."));
 
-// Add OpenTelemetry Tracing
 builder.Services.AddOpenTelemetry()
+    .WithTracing(tracerProviderBuilder =>
+    {
+        tracerProviderBuilder
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("OrderAPI"))
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter()
+            .AddJaegerExporter(options =>
+            {
+                options.AgentHost = jaegerHost;
+                options.AgentPort = jaegerPort;
+            });
+    })
     .WithMetrics(metrics =>
     {
         metrics
@@ -30,28 +50,7 @@ builder.Services.AddOpenTelemetry()
             {
                 options.Endpoint = new Uri("http://localhost:4317");
             });
-    })
-    .WithTracing(tracerProviderBuilder =>
-    {
-        tracerProviderBuilder
-            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("OrderAPI"))
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddConsoleExporter() // Debugging: View traces in the console
-            .AddJaegerExporter(options =>
-            {
-                options.AgentHost = jaegerHost;
-                options.AgentPort = jaegerPort;
-            });
     });
-
-builder.AddServiceDefaults();
-builder.AddApplicationServices();
-builder.Services.AddProblemDetails();
-
-var withApiVersioning = builder.Services.AddApiVersioning();
-
-builder.AddDefaultOpenApi(withApiVersioning);
 
 var app = builder.Build();
 
