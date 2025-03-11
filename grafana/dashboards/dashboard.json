@@ -61,7 +61,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -70,7 +71,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 2
       },
@@ -83,7 +84,7 @@
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "max"
           ],
           "fields": "",
           "values": false
@@ -127,7 +128,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -137,8 +139,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 6,
+        "w": 8,
+        "x": 8,
         "y": 2
       },
       "id": 4,
@@ -150,7 +152,7 @@
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "max"
           ],
           "fields": "",
           "values": false
@@ -194,7 +196,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "blue",
+                "value": null
               }
             ]
           }
@@ -203,72 +206,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 2
-      },
-      "id": 6,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "webstore-metrics"
-          },
-          "exemplar": true,
-          "expr": "sum(canceled_orders)",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Canceled Orders",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "webstore-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
+        "w": 8,
+        "x": 16,
         "y": 2
       },
       "id": 8,
@@ -354,7 +293,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -373,8 +313,7 @@
         "legend": {
           "calcs": [
             "mean",
-            "max",
-            "sum"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -465,7 +404,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -484,8 +424,7 @@
         "legend": {
           "calcs": [
             "mean",
-            "max",
-            "sum"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -606,7 +545,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -635,7 +575,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "max"
           ],
           "fields": "",
           "values": false
@@ -687,7 +627,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -798,7 +739,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -817,8 +759,7 @@
         "legend": {
           "calcs": [
             "mean",
-            "max",
-            "sum"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -902,7 +843,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -984,7 +926,7 @@
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "",
       "type": "traces"
     },
     {
@@ -1061,7 +1003,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1124,8 +1067,8 @@
     "list": [
       {
         "current": {
-          "text": "",
-          "value": ""
+          "text": "a9c5123bb1fe3f9402f3a35e20899369",
+          "value": "a9c5123bb1fe3f9402f3a35e20899369"
         },
         "label": "Trace ID",
         "name": "traceId",
@@ -1136,13 +1079,13 @@
     ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "E-Commerce Analytics Dashboard",
   "uid": "ecommerce-metrics",
-  "version": 16,
+  "version": 24,
   "weekStart": ""
 }

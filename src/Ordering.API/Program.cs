@@ -34,6 +34,7 @@ builder.Services.AddOpenTelemetry()
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddConsoleExporter()
+            .AddSource("eShop.Ordering.CreateOrderCommandHandler") // Register the activity source
             .AddJaegerExporter(options =>
             {
                 options.AgentHost = jaegerHost;

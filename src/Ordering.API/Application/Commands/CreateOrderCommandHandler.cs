@@ -6,6 +6,7 @@ namespace eShop.Ordering.API.Application.Commands;
 using eShop.Ordering.Domain.AggregatesModel.OrderAggregate;
 
 using eShop.Ordering.API.Telemetry;
+using System.Diagnostics;
 
 
 // Regular CommandHandler
@@ -17,6 +18,7 @@ public class CreateOrderCommandHandler
     private readonly IMediator _mediator;
     private readonly IOrderingIntegrationEventService _orderingIntegrationEventService;
     private readonly ILogger<CreateOrderCommandHandler> _logger;
+    private static readonly ActivitySource ActivitySource = new("eShop.Ordering.CreateOrderCommandHandler");
 
     // Using DI to inject infrastructure persistence Repositories
     public CreateOrderCommandHandler(IMediator mediator,
@@ -35,6 +37,18 @@ public class CreateOrderCommandHandler
 
     public async Task<bool> Handle(CreateOrderCommand message, CancellationToken cancellationToken)
     {
+
+        using var activity = ActivitySource.StartActivity("Handling CreateOrderCommand", ActivityKind.Server);
+
+        if (activity != null)
+        {
+            activity.SetTag("user.id", message.UserId.Substring(0, 4) + "****"); // Show only first 4 chars
+            activity.SetTag("user.name", message.UserName.Substring(0, 2) + "****"); // Show first 2 chars
+            activity.SetTag("order.total", message.OrderItems.Sum(item => (item.UnitPrice - item.Discount) * item.Units));
+            activity.SetTag("order.item_count", message.OrderItems.Count());
+            activity.SetTag("order.country", message.Country);
+        }
+
 
         var orderStartedIntegrationEvent = new OrderStartedIntegrationEvent(message.UserId);
         await _orderingIntegrationEventService.AddAndSaveEventAsync(orderStartedIntegrationEvent);
@@ -57,21 +71,21 @@ public class CreateOrderCommandHandler
         }
 
 
-        TelemetryMetrics.TotalRevenueCounter.Add(orderTotal, new KeyValuePair<string, object>("userId", message.UserId));
+        TelemetryMetrics.TotalRevenueCounter.Add(orderTotal, new KeyValuePair<string, object>("userId", message.UserId.Substring(0, 4) + "****"));
         _logger.LogInformation("Total Revenue Updated: {TotalRevenue}", orderTotal);
 
         _logger.LogInformation("Creating Order - Order: {@Order}", order);
-        TelemetryMetrics.OrderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
+        TelemetryMetrics.OrderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId.Substring(0, 4) + "****"));
         _logger.LogInformation("Order Placed Counter Incremented");
 
         _orderRepository.Add(order);
 
-        TelemetryMetrics.ActiveOrdersGauge.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
+        TelemetryMetrics.ActiveOrdersGauge.Add(1, new KeyValuePair<string, object>("userId", message.UserId.Substring(0, 4) + "****"));
 
         TelemetryMetrics.OrdersByCountryCounter.Add(1, new KeyValuePair<string, object>("country", message.Country));
         _logger.LogInformation("Order placed from country: {Country}", message.Country);
 
-        TelemetryMetrics.ItemsSoldCounter.Add(itemsCount, new KeyValuePair<string, object>("userId", message.UserId));
+        TelemetryMetrics.ItemsSoldCounter.Add(itemsCount, new KeyValuePair<string, object>("userId", message.UserId.Substring(0, 4) + "****"));
 
 
         return await _orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
