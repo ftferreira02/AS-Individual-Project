@@ -47,10 +47,12 @@ public class CreateOrderCommandHandler
         var order = new Order(message.UserId, message.UserName, address, message.CardTypeId, message.CardNumber, message.CardSecurityNumber, message.CardHolderName, message.CardExpiration);
 
         double orderTotal = 0;
+        int itemsCount = 0;
 
         foreach (var item in message.OrderItems)
         {
                 order.AddOrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units);
+                itemsCount += item.Units;
                 orderTotal += (double)((item.UnitPrice - item.Discount) * item.Units);
         }
 
@@ -68,6 +70,8 @@ public class CreateOrderCommandHandler
 
         TelemetryMetrics.OrdersByCountryCounter.Add(1, new KeyValuePair<string, object>("country", message.Country));
         _logger.LogInformation("Order placed from country: {Country}", message.Country);
+
+        TelemetryMetrics.ItemsSoldCounter.Add(itemsCount, new KeyValuePair<string, object>("userId", message.UserId));
 
 
         return await _orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);

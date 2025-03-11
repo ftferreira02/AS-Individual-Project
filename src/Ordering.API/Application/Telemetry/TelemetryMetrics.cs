@@ -22,6 +22,10 @@ namespace eShop.Ordering.API.Telemetry
         private static readonly Counter<long> _ordersByCountryCounter =
             Meter.CreateCounter<long>("orders_by_country", description: "Total number of placed orders by country.");
 
+        private static readonly Counter<long> _itemsSoldCounter =
+            Meter.CreateCounter<long>("items_sold", description: "Total number of individual items sold.");
+
+        public static Counter<long> ItemsSoldCounter => _itemsSoldCounter;
         public static Counter<long> OrderPlacedCounter => _orderPlacedCounter;
         public static Counter<double> TotalRevenueCounter => _totalRevenueCounter;
         public static Counter<long> CanceledOrdersCounter => _canceledOrdersCounter;
