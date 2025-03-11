@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using eShop.Ordering.API.Telemetry;
+using Microsoft.AspNetCore.Http.HttpResults;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using CardType = eShop.Ordering.API.Application.Queries.CardType;
 using Order = eShop.Ordering.API.Application.Queries.Order;
 
@@ -161,6 +163,9 @@ public static class OrdersApi
             else
             {
                 services.Logger.LogWarning("CreateOrderCommand failed - RequestId: {RequestId}", requestId);
+                // Using the property to increment the counter
+                TelemetryMetrics.CanceledOrdersCounter.Add(1);
+                services.Logger.LogInformation("Canceled Order Counter Incremented for Order");
             }
 
             return TypedResults.Ok();

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Metrics;
+using eShop.Ordering.API.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace eShop.Ordering.API.Application.Commands;
@@ -7,16 +8,14 @@ namespace eShop.Ordering.API.Application.Commands;
 public class SetPaidOrderStatusCommandHandler : IRequestHandler<SetPaidOrderStatusCommand, bool>
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly UpDownCounter<int> _activeOrdersGauge;
     private readonly ILogger<SetPaidOrderStatusCommandHandler> _logger;
 
     public SetPaidOrderStatusCommandHandler
         (IOrderRepository orderRepository
-        , UpDownCounter<int> activeOrdersGauge,
+        ,
         ILogger<SetPaidOrderStatusCommandHandler> logger)
     {
         _orderRepository = orderRepository;
-        _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
 
@@ -40,9 +39,9 @@ public class SetPaidOrderStatusCommandHandler : IRequestHandler<SetPaidOrderStat
         }
 
         orderToUpdate.SetPaidStatus();
-        // Decrement the active orders counter when an order is shipped
-        _activeOrdersGauge.Add(-1,
-            new KeyValuePair<string, object>("orderId", command.OrderNumber.ToString()));
+        TelemetryMetrics.ActiveOrdersGauge.Add(-1, new KeyValuePair<string, object>("orderId", command.OrderNumber));
+        _logger.LogInformation("Active Orders Decreased for Canceled Order: {OrderId}", command.OrderNumber);
+
 
         return await _orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
     }

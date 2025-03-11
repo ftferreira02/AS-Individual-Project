@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Application\NewFolder1\**" />
+    <Content Remove="Application\NewFolder1\**" />
+    <EmbeddedResource Remove="Application\NewFolder1\**" />
+    <None Remove="Application\NewFolder1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Shared\ActivityExtensions.cs" Link="Extensions\ActivityExtensions.cs" />
     <Compile Include="..\Shared\MigrateDbContextExtensions.cs" Link="Extensions\MigrateDbContextExtensions.cs" />
   </ItemGroup>
@@ -47,6 +54,10 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\NewFolder\" />
   </ItemGroup>
 
 </Project>

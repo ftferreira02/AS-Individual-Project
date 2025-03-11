@@ -2,6 +2,7 @@
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
+using eShop.Ordering.API.Telemetry; // Import the new metrics class
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.Http;
 
@@ -20,12 +21,10 @@ var withApiVersioning = builder.Services.AddApiVersioning();
 
 builder.AddDefaultOpenApi(withApiVersioning);
 
-var meter = new Meter("Ordering.API");
-builder.Services.AddSingleton(meter);
-builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Número total de orders."));
-
-var activeOrdersGauge = meter.CreateUpDownCounter<int>("active_orders", description: "Number of currently active orders");
-builder.Services.AddSingleton(activeOrdersGauge);
+builder.Services.AddSingleton(TelemetryMetrics.OrderPlacedCounter);
+builder.Services.AddSingleton(TelemetryMetrics.TotalRevenueCounter);
+builder.Services.AddSingleton(TelemetryMetrics.CanceledOrdersCounter);
+builder.Services.AddSingleton(TelemetryMetrics.ActiveOrdersGauge);
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
