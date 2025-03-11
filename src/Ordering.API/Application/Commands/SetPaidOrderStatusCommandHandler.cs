@@ -8,12 +8,12 @@ public class SetPaidOrderStatusCommandHandler : IRequestHandler<SetPaidOrderStat
 {
     private readonly IOrderRepository _orderRepository;
     private readonly UpDownCounter<int> _activeOrdersGauge;
-    private readonly ILogger<ShipOrderCommandHandler> _logger;
+    private readonly ILogger<SetPaidOrderStatusCommandHandler> _logger;
 
     public SetPaidOrderStatusCommandHandler
         (IOrderRepository orderRepository
         , UpDownCounter<int> activeOrdersGauge,
-        ILogger<ShipOrderCommandHandler> logger)
+        ILogger<SetPaidOrderStatusCommandHandler> logger)
     {
         _orderRepository = orderRepository;
         _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
