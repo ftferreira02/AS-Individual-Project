@@ -15,7 +15,6 @@ public class CreateOrderCommandHandler
     private readonly IOrderingIntegrationEventService _orderingIntegrationEventService;
     private readonly ILogger<CreateOrderCommandHandler> _logger;
     private readonly Counter<long> _orderPlacedCounter;
-    private readonly Histogram<double> _orderProcessingTimeHistogram;
     private readonly UpDownCounter<int> _activeOrdersGauge;
 
     // Using DI to inject infrastructure persistence Repositories
@@ -25,7 +24,6 @@ public class CreateOrderCommandHandler
         IIdentityService identityService,
         ILogger<CreateOrderCommandHandler> logger,
         Counter<long> orderPlacedCounter,
-        Histogram<double> orderProcessingTimeHistogram,
         UpDownCounter<int> activeOrdersGauge)
     {
         _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -34,15 +32,11 @@ public class CreateOrderCommandHandler
         _orderingIntegrationEventService = orderingIntegrationEventService ?? throw new ArgumentNullException(nameof(orderingIntegrationEventService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _orderPlacedCounter = orderPlacedCounter ?? throw new ArgumentNullException(nameof(orderPlacedCounter));
-        _orderProcessingTimeHistogram = orderProcessingTimeHistogram ?? throw new ArgumentNullException(nameof(orderProcessingTimeHistogram));
         _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
     }
 
     public async Task<bool> Handle(CreateOrderCommand message, CancellationToken cancellationToken)
     {
-        // Add Integration event to clean the basket
-        var timer = new System.Diagnostics.Stopwatch();
-        timer.Start();
 
         var orderStartedIntegrationEvent = new OrderStartedIntegrationEvent(message.UserId);
         await _orderingIntegrationEventService.AddAndSaveEventAsync(orderStartedIntegrationEvent);
@@ -64,11 +58,6 @@ public class CreateOrderCommandHandler
         _logger.LogInformation("Order Placed Counter Incremented");
 
         _orderRepository.Add(order);
-
-        timer.Stop();
-        _orderProcessingTimeHistogram.Record(timer.ElapsedMilliseconds,
-            new KeyValuePair<string, object>("userId", message.UserId),
-            new KeyValuePair<string, object>("orderId", order.Id.ToString()));
 
         _activeOrdersGauge.Add(1,
             new KeyValuePair<string, object>("userId", message.UserId));
