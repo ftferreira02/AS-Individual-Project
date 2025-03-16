@@ -627,8 +627,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -739,8 +738,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -843,8 +841,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1003,8 +1000,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "yellow",
@@ -1067,8 +1063,8 @@
     "list": [
       {
         "current": {
-          "text": "a9c5123bb1fe3f9402f3a35e20899369",
-          "value": "a9c5123bb1fe3f9402f3a35e20899369"
+          "text": "",
+          "value": ""
         },
         "label": "Trace ID",
         "name": "traceId",

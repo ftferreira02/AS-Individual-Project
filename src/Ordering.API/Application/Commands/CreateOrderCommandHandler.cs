@@ -87,7 +87,6 @@ public class CreateOrderCommandHandler
 
         TelemetryMetrics.ItemsSoldCounter.Add(itemsCount, new KeyValuePair<string, object>("userId", message.UserId.Substring(0, 4) + "****"));
 
-
         return await _orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
     }
 }
